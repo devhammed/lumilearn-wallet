@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\CreditRequest;
@@ -19,10 +18,7 @@ class CreditController
 
             $amount = $request->float('amount');
 
-            $wallet = Wallet::query()
-                            ->whereUserId($user->id)
-                            ->lockForUpdate()
-                            ->firstOrFail();
+            $wallet = $user->wallet()->lockForUpdate()->firstOrFail();
 
             $wallet->update([
                 'balance' => $wallet->balance + $amount,
