@@ -15,4 +15,4 @@ Route::post('/login', UserLoginController::class)
 
 Route::get('/user', UserProfileController::class)
      ->middleware('auth:sanctum')
-     ->name('users.user');
+     ->name('users.profile');
