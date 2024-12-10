@@ -12,7 +12,7 @@ it('requires authentication', function () {
 
     $response = withoutToken()->postJson(route('debit'), [
         'to_user_id' => $targetUser->getKey(),
-        'amount' => 10,
+        'amount' => fake()->randomFloat(2, 1, 100),
     ]);
 
     $response->assertUnauthorized();
@@ -27,7 +27,7 @@ it('fails if the target user does not exist', function () {
 
     $response = withToken($token)->postJson(route('debit'), [
         'to_user_id' => 'non-existent-id',
-        'amount' => 10,
+        'amount' => fake()->randomFloat(2, 1, 100),
     ]);
 
     $response->assertUnprocessable();
