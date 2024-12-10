@@ -17,7 +17,7 @@ class DebitController
         return DB::transaction(function () use ($request): JsonResponse {
             $fromUser = $request->user();
 
-            $amount = money($request->float('amount'), convert: true);
+            $amount = $request->money('amount');
 
             $fromUserWallet = $fromUser->wallet()->lockForUpdate()->firstOrFail();
 

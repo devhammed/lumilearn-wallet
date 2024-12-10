@@ -16,7 +16,7 @@ class CreditController
         return DB::transaction(function () use ($request): JsonResponse {
             $user = $request->user();
 
-            $amount = money($request->float('amount'), convert: true);
+            $amount = $request->money('amount');
 
             $wallet = $user->wallet()->lockForUpdate()->firstOrFail();
 

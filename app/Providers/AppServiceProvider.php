@@ -7,6 +7,7 @@ use App\Models\Wallet;
 use Akaunting\Money\Money;
 use Carbon\CarbonImmutable;
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Http\Request;
 use App\Models\PersonalAccessToken;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
                 'currency' => $this->getCurrency()->getCurrency(),
                 'formatted' => $this->formatWithoutZeroes(),
             ];
+        });
+
+        Request::macro('money', function (string $key, bool $convert = true): Money {
+            return money($this->float($key), convert: $convert);
         });
     }
 }
