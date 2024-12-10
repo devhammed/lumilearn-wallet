@@ -25,7 +25,6 @@ class DebitRequest extends FormRequest
                 'required',
                 'numeric',
                 'gt:0',
-                'lte:10000',
             ],
         ];
     }

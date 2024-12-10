@@ -73,7 +73,14 @@ it('logs in a user', function () {
 
     $response->assertJson([
         'data' => [
-            'user_id' => $user->id,
+            'user_id' => $user->getKey(),
         ],
+    ]);
+
+    $this->assertDatabaseHas('personal_access_tokens', [
+        'id' => $response->json('data.id'),
+        'tokenable_id' => $user->getKey(),
+        'tokenable_type' => $user->getMorphClass(),
+        'name' => $response->json('data.name'),
     ]);
 })->coversClass(LoginController::class);

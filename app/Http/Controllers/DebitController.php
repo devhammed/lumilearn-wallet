@@ -17,7 +17,7 @@ class DebitController
         return DB::transaction(function () use ($request): JsonResponse {
             $fromUser = $request->user();
 
-            $amount = $request->float('amount');
+            $amount = money($request->float('amount'), convert: true);
 
             $fromUserWallet = $fromUser->wallet()->lockForUpdate()->firstOrFail();
 
@@ -26,18 +26,18 @@ class DebitController
                                   ->lockForUpdate()
                                   ->firstOrFail();
 
-            if ($fromUserWallet->balance < $amount) {
+            if ($fromUserWallet->balance->lessThan($amount)) {
                 return response()->json([
                     'message' => __('Insufficient balance'),
                 ], 400);
             }
 
             $fromUserWallet->update([
-                'balance' => $fromUserWallet->balance - $amount,
+                'balance' => $fromUserWallet->balance->subtract($amount),
             ]);
 
             $toUserWallet->update([
-                'balance' => $toUserWallet->balance + $amount,
+                'balance' => $toUserWallet->balance->add($amount),
             ]);
 
             return response()->json([

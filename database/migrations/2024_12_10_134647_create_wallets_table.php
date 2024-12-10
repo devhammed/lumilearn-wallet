@@ -16,8 +16,7 @@ return new class extends Migration {
                   ->constrained()
                   ->cascadeOnUpdate()
                   ->cascadeOnDelete();
-            $table->string('currency');
-            $table->unsignedBigInteger('balance');
+            $table->json('balance');
             $table->timestamps();
         });
     }

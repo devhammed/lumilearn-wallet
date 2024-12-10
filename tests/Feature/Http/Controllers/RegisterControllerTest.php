@@ -64,8 +64,11 @@ it('registers a new user', function () {
             'wallet' => [
                 'id',
                 'user_id',
-                'currency',
-                'balance',
+                'balance' => [
+                    'amount',
+                    'currency',
+                    'formatted',
+                ],
                 'created_at',
                 'updated_at',
             ],
@@ -80,7 +83,7 @@ it('registers a new user', function () {
 
     $this->assertDatabaseHas('wallets', [
         'user_id' => $response->json('data.id'),
-        'currency' => config('app.currency'),
-        'balance' => 0,
+        'balance->amount' => 0,
+        'balance->currency' => config('money.defaults.currency'),
     ]);
 })->coversClass(RegisterController::class);

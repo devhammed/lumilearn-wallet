@@ -2,6 +2,7 @@
 
 
 use App\Models\User;
+use App\Models\Wallet;
 use App\Http\Controllers\DebitController;
 use function Pest\Laravel\withToken;
 use function Pest\Laravel\withoutToken;
@@ -10,7 +11,7 @@ it('requires authentication', function () {
     $targetUser = User::factory()->create();
 
     $response = withoutToken()->postJson(route('debit'), [
-        'to_user_id' => $targetUser->id,
+        'to_user_id' => $targetUser->getKey(),
         'amount' => 10,
     ]);
 
@@ -37,14 +38,12 @@ it('fails if the target user does not exist', function () {
 it('fails if the target user is the same as the current user', function () {
     $user = User::factory()->create();
 
-    $userBalance = fake()->numberBetween(10, 100);
+    Wallet::factory()->for($user)->create();
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $user->wallet()->create(['balance' => $userBalance]);
-
     $response = withToken($token)->postJson(route('debit'), [
-        'to_user_id' => $user->id,
+        'to_user_id' => $user->getKey(),
         'amount' => 10,
     ]);
 
@@ -58,16 +57,14 @@ it('fails if the amount is not greater than 0', function () {
 
     $targetUser = User::factory()->create();
 
-    $userBalance = fake()->numberBetween(10, 100);
-
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $user->wallet()->create(['balance' => $userBalance]);
+    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
-    $targetUser->wallet()->create(['balance' => 0]);
+    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
     $response = withToken($token)->postJson(route('debit'), [
-        'to_user_id' => $targetUser->id,
+        'to_user_id' => $targetUser->getKey(),
         'amount' => 0,
     ]);
 
@@ -81,17 +78,15 @@ it('fails if the current user has insufficient balance', function () {
 
     $targetUser = User::factory()->create();
 
-    $userBalance = fake()->numberBetween(10, 100);
+    $userWallet = Wallet::factory()->for($user)->create();
 
-    $user->wallet()->create(['balance' => $userBalance]);
-
-    $targetUser->wallet()->create(['balance' => 0]);
+    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
     $response = withToken($token)->postJson(route('debit'), [
-        'to_user_id' => $targetUser->id,
-        'amount' => $userBalance * 2,
+        'to_user_id' => $targetUser->getKey(),
+        'amount' => $userWallet->balance->multiply(2)->getValue(),
     ]);
 
     $response->assertBadRequest();
@@ -106,21 +101,17 @@ it('debits the current user wallet and credits the target user wallet', function
 
     $targetUser = User::factory()->create();
 
-    $targetUserBalance = fake()->numberBetween(10, 100);
+    $userWallet = Wallet::factory()->for($user)->create();
 
-    $userBalance = fake()->numberBetween($targetUserBalance + 1, 200);
-
-    $toDebit = fake()->numberBetween(1, $userBalance - $targetUserBalance);
-
-    $userWallet = $user->wallet()->create(['balance' => $userBalance]);
-
-    $targetUserWallet = $targetUser->wallet()->create(['balance' => $targetUserBalance]);
+    $targetUserWallet = Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
+    $debitAmount = money(fake()->numberBetween(1, $userWallet->balance->getValue()), convert: true);
+
     $response = withToken($token)->postJson(route('debit'), [
-        'to_user_id' => $targetUser->id,
-        'amount' => $toDebit,
+        'to_user_id' => $targetUser->getKey(),
+        'amount' => $debitAmount->getValue(),
     ]);
 
     $response->assertOk();
@@ -130,12 +121,16 @@ it('debits the current user wallet and credits the target user wallet', function
     ]);
 
     $this->assertDatabaseHas('wallets', [
-        'user_id' => $user->id,
-        'balance' => $userWallet->currency->toDatabaseAmount($userBalance - $toDebit),
+        'id' => $userWallet->getKey(),
+        'user_id' => $user->getKey(),
+        'balance->amount' => $userWallet->balance->subtract($debitAmount)->getAmount(),
+        'balance->currency' => $userWallet->balance->getCurrency()->getCurrency(),
     ]);
 
     $this->assertDatabaseHas('wallets', [
-        'user_id' => $targetUser->id,
-        'balance' => $targetUserWallet->currency->toDatabaseAmount($targetUserBalance + $toDebit),
+        'id' => $targetUserWallet->getKey(),
+        'user_id' => $targetUser->getKey(),
+        'balance->amount' => $targetUserWallet->balance->add($debitAmount)->getAmount(),
+        'balance->currency' => $targetUserWallet->balance->getCurrency()->getCurrency(),
     ]);
 })->coversClass(DebitController::class)->repeat(50);

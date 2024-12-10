@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\Currency;
+use Akaunting\Money\Casts\MoneyCast;
 use Database\Factories\WalletFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -20,7 +19,6 @@ class Wallet extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'currency',
         'balance',
     ];
 
@@ -30,8 +28,7 @@ class Wallet extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'currency' => Currency::USD,
-        'balance' => 0,
+        'balance' => '{"amount":0,"currency":"USD"}',
     ];
 
     /**
@@ -42,20 +39,8 @@ class Wallet extends Model
     protected function casts(): array
     {
         return [
-            'currency' => Currency::class,
-            'balance' => 'integer',
+            'balance' => MoneyCast::class,
         ];
-    }
-
-    /**
-     * Get or set the "balance" attribute.
-     */
-    public function balance(): Attribute
-    {
-        return Attribute::make(
-            get: fn(int $value) => $this->currency->fromDatabaseAmount($value),
-            set: fn(float $value) => $this->currency->toDatabaseAmount($value),
-        );
     }
 
     /**

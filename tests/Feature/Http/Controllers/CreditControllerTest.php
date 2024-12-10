@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Wallet;
 use App\Http\Controllers\CreditController;
 use function Pest\Laravel\withToken;
 use function Pest\Laravel\withoutToken;
@@ -18,9 +19,7 @@ it('requires authentication', function () {
 it('fails if the amount is not greater than 0', function () {
     $user = User::factory()->create();
 
-    $userBalance = fake()->numberBetween(10, 100);
-
-    $wallet = $user->wallet()->create(['balance' => $userBalance]);
+    $wallet = Wallet::factory()->for($user)->create();
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -33,26 +32,22 @@ it('fails if the amount is not greater than 0', function () {
     $response->assertJsonValidationErrors(['amount']);
 
     $this->assertDatabaseHas('wallets', [
-        'user_id' => $user->id,
-        'balance' => $wallet->currency->toDatabaseAmount($userBalance),
+        'user_id' => $user->getKey(),
+        'balance->amount' => $wallet->balance->getAmount(),
     ]);
 })->coversClass(CreditController::class);
 
 it('credits the authenticated user wallet', function () {
     $user = User::factory()->create();
 
-    $creditAmount = fake()->numberBetween(10, 100);
+    $wallet = Wallet::factory()->for($user)->create();
 
-    $userBalance = fake()->numberBetween(10, 100);
-
-    $wallet = $user->wallet()->create(['balance' => $userBalance]);
+    $creditAmount = money(fake()->numberBetween(10, 100), convert: true);
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $finalAmount = $userBalance + $creditAmount;
-
     $response = withToken($token)->postJson(route('credit'), [
-        'amount' => $creditAmount,
+        'amount' => $creditAmount->getValue(),
     ]);
 
     $response->assertOk();
@@ -62,7 +57,7 @@ it('credits the authenticated user wallet', function () {
     ]);
 
     $this->assertDatabaseHas('wallets', [
-        'user_id' => $user->id,
-        'balance' => $wallet->currency->toDatabaseAmount($finalAmount),
+        'user_id' => $user->getKey(),
+        'balance->amount' => $wallet->balance->add($creditAmount)->getAmount(),
     ]);
 })->coversClass(CreditController::class)->repeat(50);

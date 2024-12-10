@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Wallet;
+use Akaunting\Money\Money;
 use Carbon\CarbonImmutable;
 use Laravel\Sanctum\Sanctum;
 use App\Models\PersonalAccessToken;
@@ -36,5 +37,13 @@ class AppServiceProvider extends ServiceProvider
             'wallet' => Wallet::class,
             'personal_access_token' => PersonalAccessToken::class,
         ]);
+
+        Money::macro('getArray', function (): array {
+            return [
+                'amount' => $this->getAmount(),
+                'currency' => $this->getCurrency()->getCurrency(),
+                'formatted' => $this->formatWithoutZeroes(),
+            ];
+        });
     }
 }
