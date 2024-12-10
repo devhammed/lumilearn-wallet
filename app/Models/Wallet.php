@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Currency;
 use Database\Factories\WalletFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -44,6 +45,17 @@ class Wallet extends Model
             'currency' => Currency::class,
             'balance' => 'integer',
         ];
+    }
+
+    /**
+     * Get or set the balance attribute.
+     */
+    public function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn(int $value) => $value / $this->currency->getSubunit(),
+            set: fn(float $value) => $value * $this->currency->getSubunit(),
+        );
     }
 
     /**

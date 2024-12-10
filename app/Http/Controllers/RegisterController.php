@@ -15,6 +15,8 @@ class RegisterController
     {
         $user = User::create($request->validated());
 
+        $user->wallet()->create();
+
         $user->loadMissing('wallet');
 
         return UserResource::make($user);

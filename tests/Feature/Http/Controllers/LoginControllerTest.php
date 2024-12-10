@@ -7,11 +7,12 @@ use function Pest\Laravel\postJson;
 it('cannot login a user with missing data', function () {
     $response = postJson(route('login'), []);
 
-    $response->assertUnprocessable()
-             ->assertJsonValidationErrors([
-                 'email',
-                 'password',
-             ]);
+    $response->assertUnprocessable();
+
+    $response->assertJsonValidationErrors([
+        'email',
+        'password',
+    ]);
 });
 
 it('cannot login a user with invalid data', function () {
@@ -20,10 +21,11 @@ it('cannot login a user with invalid data', function () {
         'password' => 'password',
     ]);
 
-    $response->assertUnprocessable()
-             ->assertJsonValidationErrors([
-                 'email',
-             ]);
+    $response->assertUnprocessable();
+
+    $response->assertJsonValidationErrors([
+        'email',
+    ]);
 });
 
 it('cannot login a user with incorrect credentials', function () {
@@ -48,19 +50,29 @@ it('logs in a user', function () {
         'email' => 'john@example.com',
     ]);
 
+    $user->wallet()->create();
+
     $response = postJson(route('login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $response->assertOk()
-             ->assertJsonStructure([
-                 'data' => [
-                     'id',
-                     'name',
-                     'token',
-                     'abilities',
-                     'expires_at',
-                 ],
-             ]);
+    $response->assertOk();
+
+    $response->assertJsonStructure([
+        'data' => [
+            'id',
+            'user_id',
+            'name',
+            'token',
+            'abilities',
+            'expires_at',
+        ],
+    ]);
+
+    $response->assertJson([
+        'data' => [
+            'user_id' => $user->id,
+        ],
+    ]);
 });

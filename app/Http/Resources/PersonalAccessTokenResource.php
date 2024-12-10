@@ -20,6 +20,7 @@ class PersonalAccessTokenResource extends JsonResource
     {
         return [
             'id' => $this->accessToken->id,
+            'user_id' => $this->accessToken->tokenable_id,
             'name' => $this->accessToken->name,
             'token' => $this->plainTextToken,
             'abilities' => $this->accessToken->abilities,

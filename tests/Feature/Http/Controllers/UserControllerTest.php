@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use function Pest\Laravel\withToken;
 use function Pest\Laravel\withoutToken;
+use function Pest\Laravel\withToken;
 
 it('cannot retrieve user information without authentication', function () {
     $response = withoutToken()->getJson(route('user'));
@@ -20,20 +20,23 @@ it('retrieves user information', function () {
         'email' => 'john@example.com',
     ]);
 
+    $user->wallet()->create();
+
     $token = $user->createToken('auth_token')->plainTextToken;
 
     $response = withToken($token)->getJson(route('user'));
 
-    $response->assertOk()
-             ->assertJson([
-                 'data' => [
-                     'id' => $user->getKey(),
-                     'name' => 'John Doe',
-                     'email' => 'john@example.com',
-                     'wallet' => [
-                         'balance' => 0,
-                         'currency' => config('app.currency')->value,
-                     ],
-                 ],
-             ]);
+    $response->assertOk();
+
+    $response->assertJson([
+        'data' => [
+            'id' => $user->getKey(),
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'wallet' => [
+                'balance' => 0,
+                'currency' => config('app.currency')->value,
+            ],
+        ],
+    ]);
 });

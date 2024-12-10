@@ -6,11 +6,12 @@ use function Pest\Laravel\postJson;
 it('cannot register a new user with missing data', function () {
     $response = postJson(route('register'), []);
 
-    $response->assertUnprocessable()
-             ->assertJsonValidationErrors([
-                 'name',
-                 'email',
-             ]);
+    $response->assertUnprocessable();
+
+    $response->assertJsonValidationErrors([
+        'name',
+        'email',
+    ]);
 });
 
 it('cannot register a new user with invalid data', function () {
