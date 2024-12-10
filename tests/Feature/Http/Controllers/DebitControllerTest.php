@@ -16,9 +16,9 @@ it('debits the current user\'s wallet and credits the target user\'s wallet', fu
 
     $toDebit = fake()->numberBetween(1, $userBalance - $targetUserBalance);
 
-    $user->wallet()->create(['balance' => $userBalance]);
+    $userWallet = $user->wallet()->create(['balance' => $userBalance]);
 
-    $targetUser->wallet()->create(['balance' => $targetUserBalance]);
+    $targetUserWallet = $targetUser->wallet()->create(['balance' => $targetUserBalance]);
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -33,16 +33,14 @@ it('debits the current user\'s wallet and credits the target user\'s wallet', fu
         'message' => __('Transaction successful'),
     ]);
 
-    $currency = config('app.currency');
-
     $this->assertDatabaseHas('wallets', [
         'user_id' => $user->id,
-        'balance' => $currency->toDatabaseAmount($userBalance - $toDebit),
+        'balance' => $userWallet->currency->toDatabaseAmount($userBalance - $toDebit),
     ]);
 
     $this->assertDatabaseHas('wallets', [
         'user_id' => $targetUser->id,
-        'balance' => $currency->toDatabaseAmount($targetUserBalance + $toDebit),
+        'balance' => $targetUserWallet->currency->toDatabaseAmount($targetUserBalance + $toDebit),
     ]);
 })->repeat(50)->coversClass(DebitController::class);
 
