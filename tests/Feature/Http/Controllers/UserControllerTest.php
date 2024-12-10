@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Models\User;
 use function Pest\Laravel\withoutToken;
 use function Pest\Laravel\withToken;
@@ -12,7 +13,7 @@ it('cannot retrieve user information without authentication', function () {
     $response->assertJsonStructure([
         'message',
     ]);
-});
+})->coversClass(UserController::class);
 
 it('retrieves user information', function () {
     $user = User::factory()->create([
@@ -39,4 +40,4 @@ it('retrieves user information', function () {
             ],
         ],
     ]);
-});
+})->coversClass(UserController::class);

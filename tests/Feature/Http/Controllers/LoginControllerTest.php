@@ -2,6 +2,7 @@
 
 
 use App\Models\User;
+use App\Http\Controllers\LoginController;
 use function Pest\Laravel\postJson;
 
 it('cannot login a user with missing data', function () {
@@ -13,7 +14,7 @@ it('cannot login a user with missing data', function () {
         'email',
         'password',
     ]);
-});
+})->coversClass(LoginController::class);
 
 it('cannot login a user with invalid data', function () {
     $response = postJson(route('login'), [
@@ -26,7 +27,7 @@ it('cannot login a user with invalid data', function () {
     $response->assertJsonValidationErrors([
         'email',
     ]);
-});
+})->coversClass(LoginController::class);
 
 it('cannot login a user with incorrect credentials', function () {
     $user = User::factory()->create([
@@ -43,7 +44,7 @@ it('cannot login a user with incorrect credentials', function () {
     $response->assertJsonStructure([
         'message',
     ]);
-});
+})->coversClass(LoginController::class);
 
 it('logs in a user', function () {
     $user = User::factory()->create([
@@ -75,4 +76,4 @@ it('logs in a user', function () {
             'user_id' => $user->id,
         ],
     ]);
-});
+})->coversClass(LoginController::class);

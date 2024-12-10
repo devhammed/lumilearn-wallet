@@ -2,6 +2,7 @@
 
 
 use App\Models\User;
+use App\Http\Controllers\DebitController;
 use function Pest\Laravel\withToken;
 
 it('debits the current user\'s wallet and credits the target user\'s wallet', function () {
@@ -43,7 +44,7 @@ it('debits the current user\'s wallet and credits the target user\'s wallet', fu
         'user_id' => $targetUser->id,
         'balance' => $currency->toDatabaseAmount($targetUserBalance + $toDebit),
     ]);
-})->repeat(10);
+})->repeat(50)->coversClass(DebitController::class);
 
 it('fails if the target user does not exist', function () {
     $user = User::factory()->create();
@@ -58,7 +59,7 @@ it('fails if the target user does not exist', function () {
     $response->assertUnprocessable();
 
     $response->assertJsonValidationErrors(['to_user_id']);
-});
+})->coversClass(DebitController::class);
 
 it('fails if the target user is the same as the current user', function () {
     $user = User::factory()->create();
@@ -77,7 +78,7 @@ it('fails if the target user is the same as the current user', function () {
     $response->assertUnprocessable();
 
     $response->assertJsonValidationErrors(['to_user_id']);
-});
+})->coversClass(DebitController::class);
 
 it('fails if the amount is not greater than 0', function () {
     $user = User::factory()->create();
@@ -100,7 +101,7 @@ it('fails if the amount is not greater than 0', function () {
     $response->assertUnprocessable();
 
     $response->assertJsonValidationErrors(['amount']);
-});
+})->coversClass(DebitController::class);
 
 it('fails if the current user has insufficient balance', function () {
     $user = User::factory()->create();
@@ -125,4 +126,4 @@ it('fails if the current user has insufficient balance', function () {
     $response->assertJson([
         'message' => __('Insufficient balance'),
     ]);
-})->repeat(10);
+})->repeat(50)->coversClass(DebitController::class);

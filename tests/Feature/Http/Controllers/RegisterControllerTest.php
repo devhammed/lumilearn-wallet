@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Http\Controllers\RegisterController;
 use function Pest\Laravel\postJson;
 
 it('cannot register a new user with missing data', function () {
@@ -12,7 +13,7 @@ it('cannot register a new user with missing data', function () {
         'name',
         'email',
     ]);
-});
+})->coversClass(RegisterController::class);
 
 it('cannot register a new user with invalid data', function () {
     $response = postJson(route('register'), [
@@ -26,7 +27,7 @@ it('cannot register a new user with invalid data', function () {
     $response->assertJsonValidationErrors([
         'email',
     ]);
-});
+})->coversClass(RegisterController::class);
 
 it('cannot register a new user with an existing email', function () {
     User::factory()->create([
@@ -44,7 +45,7 @@ it('cannot register a new user with an existing email', function () {
     $response->assertJsonValidationErrors([
         'email',
     ]);
-});
+})->coversClass(RegisterController::class);
 
 it('registers a new user', function () {
     $response = postJson(route('register'), [
@@ -82,4 +83,4 @@ it('registers a new user', function () {
         'currency' => config('app.currency'),
         'balance' => 0,
     ]);
-});
+})->coversClass(RegisterController::class);
