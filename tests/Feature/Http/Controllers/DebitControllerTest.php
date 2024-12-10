@@ -101,7 +101,7 @@ it('fails if the current user has insufficient balance', function () {
     ]);
 })->repeat(50)->coversClass(DebitController::class);
 
-it('debits the current user\'s wallet and credits the target user\'s wallet', function () {
+it('debits the current user wallet and credits the target user wallet', function () {
     $user = User::factory()->create();
 
     $targetUser = User::factory()->create();

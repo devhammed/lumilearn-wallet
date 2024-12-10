@@ -38,7 +38,7 @@ it('fails if the amount is not greater than 0', function () {
     ]);
 })->coversClass(CreditController::class);
 
-it('credits the authenticated user\'s wallet', function () {
+it('credits the authenticated user wallet', function () {
     $user = User::factory()->create();
 
     $creditAmount = fake()->numberBetween(10, 100);
