@@ -36,10 +36,7 @@ class DebitRequest extends FormRequest
      */
     public function toUser(): User
     {
-        return User::findOrFail(
-            $this->integer('to_user_id'),
-            ['id'],
-        );
+        return User::findOrFail($this->integer('to_user_id'), 'id');
     }
 
     /**
