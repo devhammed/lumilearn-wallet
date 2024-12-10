@@ -99,7 +99,7 @@ it('fails if the current user has insufficient balance', function () {
     $response->assertJson([
         'message' => __('Insufficient balance'),
     ]);
-})->repeat(50)->coversClass(DebitController::class);
+})->coversClass(DebitController::class)->repeat(50);
 
 it('debits the current user wallet and credits the target user wallet', function () {
     $user = User::factory()->create();
@@ -138,4 +138,4 @@ it('debits the current user wallet and credits the target user wallet', function
         'user_id' => $targetUser->id,
         'balance' => $targetUserWallet->currency->toDatabaseAmount($targetUserBalance + $toDebit),
     ]);
-})->repeat(50)->coversClass(DebitController::class);
+})->coversClass(DebitController::class)->repeat(50);
