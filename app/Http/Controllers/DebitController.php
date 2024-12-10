@@ -21,10 +21,7 @@ class DebitController
 
             $fromUserWallet = $fromUser->wallet()->lockForUpdate()->firstOrFail();
 
-            $toUserWallet = Wallet::query()
-                                  ->whereUserId($request->to_user_id)
-                                  ->lockForUpdate()
-                                  ->firstOrFail();
+            $toUserWallet = Wallet::whereUserId($request->to_user_id)->lockForUpdate()->sole();
 
             if ($fromUserWallet->balance->lessThan($amount)) {
                 return response()->json([

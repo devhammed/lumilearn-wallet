@@ -18,7 +18,7 @@ class CreditController
 
             $amount = $request->money('amount');
 
-            $wallet = $user->wallet()->lockForUpdate()->firstOrFail();
+            $wallet = $user->wallet()->lockForUpdate()->sole();
 
             $wallet->update([
                 'balance' => $wallet->balance->add($amount),
