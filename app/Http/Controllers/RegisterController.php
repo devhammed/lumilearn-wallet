@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Http\Resources\UserResource;
+use App\Http\Requests\RegisterRequest;
 
-class UserProfileController
+class RegisterController
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): UserResource
+    public function __invoke(RegisterRequest $request): UserResource
     {
-        $user = $request->user();
+        $user = User::create($request->validated());
 
         $user->loadMissing('wallet');
 

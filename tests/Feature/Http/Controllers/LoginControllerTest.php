@@ -5,7 +5,7 @@ use App\Models\User;
 use function Pest\Laravel\postJson;
 
 it('cannot login a user with missing data', function () {
-    $response = postJson(route('users.login'), []);
+    $response = postJson(route('login'), []);
 
     $response->assertUnprocessable()
              ->assertJsonValidationErrors([
@@ -15,7 +15,7 @@ it('cannot login a user with missing data', function () {
 });
 
 it('cannot login a user with invalid data', function () {
-    $response = postJson(route('users.login'), [
+    $response = postJson(route('login'), [
         'email' => 'invalid-email',
         'password' => 'password',
     ]);
@@ -31,7 +31,7 @@ it('cannot login a user with incorrect credentials', function () {
         'email' => 'john@example',
     ]);
 
-    $response = postJson(route('users.login'), [
+    $response = postJson(route('login'), [
         'email' => $user->email,
         'password' => 'invalid-password',
     ]);
@@ -48,7 +48,7 @@ it('logs in a user', function () {
         'email' => 'john@example.com',
     ]);
 
-    $response = postJson(route('users.login'), [
+    $response = postJson(route('login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);

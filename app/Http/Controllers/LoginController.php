@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Contracts\Auth\Guard;
-use App\Http\Requests\UserLoginRequest;
 use App\Http\Resources\PersonalAccessTokenResource;
 
-class UserLoginController
+class LoginController
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(UserLoginRequest $request, Guard $guard): PersonalAccessTokenResource
+    public function __invoke(LoginRequest $request, Guard $guard): PersonalAccessTokenResource
     {
         $user = User::whereEmail($request->email)->first();
 

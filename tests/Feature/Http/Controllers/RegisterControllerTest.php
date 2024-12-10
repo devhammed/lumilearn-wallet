@@ -4,7 +4,7 @@ use App\Models\User;
 use function Pest\Laravel\postJson;
 
 it('cannot register a new user with missing data', function () {
-    $response = postJson(route('users.register'), []);
+    $response = postJson(route('register'), []);
 
     $response->assertUnprocessable()
              ->assertJsonValidationErrors([
@@ -14,16 +14,17 @@ it('cannot register a new user with missing data', function () {
 });
 
 it('cannot register a new user with invalid data', function () {
-    $response = postJson(route('users.register'), [
+    $response = postJson(route('register'), [
         'name' => 'John Doe',
         'email' => 'invalid-email',
         'password' => 'password',
     ]);
 
-    $response->assertUnprocessable()
-             ->assertJsonValidationErrors([
-                 'email',
-             ]);
+    $response->assertUnprocessable();
+
+    $response->assertJsonValidationErrors([
+        'email',
+    ]);
 });
 
 it('cannot register a new user with an existing email', function () {
@@ -31,46 +32,48 @@ it('cannot register a new user with an existing email', function () {
         'email' => 'john@example.com',
     ]);
 
-    $response = postJson(route('users.register'), [
+    $response = postJson(route('register'), [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'password' => 'password',
     ]);
 
-    $response->assertUnprocessable()
-             ->assertJsonValidationErrors([
-                 'email',
-             ]);
+    $response->assertUnprocessable();
+
+    $response->assertJsonValidationErrors([
+        'email',
+    ]);
 });
 
 it('registers a new user', function () {
-    $response = postJson(route('users.register'), [
+    $response = postJson(route('register'), [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'password' => 'password',
     ]);
 
-    $response->assertCreated()
-             ->assertJsonStructure([
-                 'data' => [
-                     'id',
-                     'name',
-                     'email',
-                     'wallet' => [
-                         'id',
-                         'user_id',
-                         'currency',
-                         'balance',
-                         'created_at',
-                         'updated_at',
-                     ],
-                     'created_at',
-                     'updated_at',
-                 ],
-             ]);
+    $response->assertCreated();
+
+    $response->assertJsonStructure([
+        'data' => [
+            'id',
+            'name',
+            'email',
+            'wallet' => [
+                'id',
+                'user_id',
+                'currency',
+                'balance',
+                'created_at',
+                'updated_at',
+            ],
+            'created_at',
+            'updated_at',
+        ],
+    ]);
 
     $this->assertDatabaseHas('users', [
-        'email' => 'john@example.com',
+        'email' => $response->json('data.email'),
     ]);
 
     $this->assertDatabaseHas('wallets', [

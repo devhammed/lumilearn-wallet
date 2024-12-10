@@ -1,18 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserLoginController;
-use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\UserRegisterController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
 
-Route::post('/user', UserRegisterController::class)
-     ->middleware('guest:sanctum')
-     ->name('users.register');
-
-Route::post('/login', UserLoginController::class)
-     ->middleware('guest:sanctum')
-     ->name('users.login');
-
-Route::get('/user', UserProfileController::class)
+Route::get('/user', UserController::class)
      ->middleware('auth:sanctum')
-     ->name('users.profile');
+     ->name('user');
+
+Route::post('/user', RegisterController::class)
+     ->middleware('guest:sanctum')
+     ->name('register');
+
+Route::post('/login', LoginController::class)
+     ->middleware('guest:sanctum')
+     ->name('login');

@@ -5,7 +5,7 @@ use function Pest\Laravel\withToken;
 use function Pest\Laravel\withoutToken;
 
 it('cannot retrieve user information without authentication', function () {
-    $response = withoutToken()->getJson(route('users.profile'));
+    $response = withoutToken()->getJson(route('user'));
 
     $response->assertUnauthorized();
 
@@ -22,7 +22,7 @@ it('retrieves user information', function () {
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $response = withToken($token)->getJson(route('users.profile'));
+    $response = withToken($token)->getJson(route('user'));
 
     $response->assertOk()
              ->assertJson([
