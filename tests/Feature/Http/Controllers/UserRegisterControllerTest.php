@@ -4,7 +4,7 @@ use App\Models\User;
 use function Pest\Laravel\postJson;
 
 it('cannot register a new user with missing data', function () {
-    $response = postJson('/user', []);
+    $response = postJson(route('users.register'), []);
 
     $response->assertUnprocessable()
              ->assertJsonValidationErrors([
@@ -14,7 +14,7 @@ it('cannot register a new user with missing data', function () {
 });
 
 it('cannot register a new user with invalid data', function () {
-    $response = postJson('/user', [
+    $response = postJson(route('users.register'), [
         'name' => 'John Doe',
         'email' => 'invalid-email',
         'password' => 'password',
@@ -31,7 +31,7 @@ it('cannot register a new user with an existing email', function () {
         'email' => 'john@example.com',
     ]);
 
-    $response = postJson('/user', [
+    $response = postJson(route('users.register'), [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'password' => 'password',
@@ -44,7 +44,7 @@ it('cannot register a new user with an existing email', function () {
 });
 
 it('registers a new user', function () {
-    $response = postJson('/user', [
+    $response = postJson(route('users.register'), [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'password' => 'password',
