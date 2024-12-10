@@ -8,6 +8,7 @@ use Akaunting\Money\Money;
 use Carbon\CarbonImmutable;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Http\Request;
+use Akaunting\Money\Currency;
 use App\Models\PersonalAccessToken;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
@@ -47,8 +48,8 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
-        Request::macro('money', function (string $key, bool $convert = true): Money {
-            return money($this->float($key), convert: $convert);
+        Request::macro('money', function (string $key, ?Currency $currency = null, ?bool $convert = true): Money {
+            return money($this->float($key), $currency, $convert);
         });
     }
 }
