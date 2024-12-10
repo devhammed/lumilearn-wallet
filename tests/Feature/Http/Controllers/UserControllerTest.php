@@ -5,14 +5,12 @@ use App\Models\User;
 use function Pest\Laravel\withoutToken;
 use function Pest\Laravel\withToken;
 
-it('cannot retrieve user information without authentication', function () {
+it('requires authentication', function () {
     $response = withoutToken()->getJson(route('user'));
 
     $response->assertUnauthorized();
 
-    $response->assertJsonStructure([
-        'message',
-    ]);
+    $response->assertJsonStructure(['message']);
 })->coversClass(UserController::class);
 
 it('retrieves user information', function () {
