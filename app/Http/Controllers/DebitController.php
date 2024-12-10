@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\DebitRequest;
@@ -16,13 +17,17 @@ class DebitController
         return DB::transaction(function () use ($request): JsonResponse {
             $fromUser = $request->user();
 
-            $toUser = $request->toUser();
+            $amount = $request->float('amount');
 
-            $amount = $request->amount();
+            $fromUserWallet = Wallet::query()
+                                    ->whereUserId($fromUser->id)
+                                    ->lockForUpdate()
+                                    ->firstOrFail();
 
-            $fromUserWallet = $fromUser->wallet()->lockForUpdate()->first();
-
-            $toUserWallet = $toUser->wallet()->lockForUpdate()->first();
+            $toUserWallet = Wallet::query()
+                                  ->whereUserId($request->to_user_id)
+                                  ->lockForUpdate()
+                                  ->firstOrFail();
 
             if ($fromUserWallet->balance < $amount) {
                 return response()->json([

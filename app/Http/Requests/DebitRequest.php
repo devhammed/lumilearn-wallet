@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -29,21 +28,5 @@ class DebitRequest extends FormRequest
                 'lte:10000',
             ],
         ];
-    }
-
-    /**
-     * Get the target user.
-     */
-    public function toUser(): User
-    {
-        return User::findOrFail($this->integer('to_user_id'), 'id');
-    }
-
-    /**
-     * Get the amount as a float.
-     */
-    public function amount(): float
-    {
-        return $this->float('amount');
     }
 }

@@ -84,7 +84,13 @@ it('fails if the amount is not greater than 0', function () {
 
     $targetUser = User::factory()->create();
 
+    $userBalance = fake()->numberBetween(10, 100);
+
     $token = $user->createToken('auth_token')->plainTextToken;
+
+    $user->wallet()->create(['balance' => $userBalance]);
+
+    $targetUser->wallet()->create(['balance' => 0]);
 
     $response = withToken($token)->postJson(route('debit'), [
         'to_user_id' => $targetUser->id,
@@ -104,6 +110,8 @@ it('fails if the current user has insufficient balance', function () {
     $userBalance = fake()->numberBetween(10, 100);
 
     $user->wallet()->create(['balance' => $userBalance]);
+
+    $targetUser->wallet()->create(['balance' => 0]);
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
