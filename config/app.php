@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'currency' => env('APP_CURRENCY', 'USD'),
+    'currency' => App\Enums\Currency::from(env('APP_CURRENCY', 'USD')),
 
     'locale' => env('APP_LOCALE', 'en'),
 

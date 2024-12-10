@@ -2,7 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Models\Wallet;
+use Carbon\CarbonImmutable;
+use Laravel\Sanctum\Sanctum;
+use App\Models\PersonalAccessToken;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
     }
 
     /**
@@ -19,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Date::useClass(CarbonImmutable::class);
+
+        Model::shouldBeStrict(! $this->app->isProduction());
+
+        Relation::enforceMorphMap([
+            'user' => User::class,
+            'wallet' => Wallet::class,
+            'personal_access_token' => PersonalAccessToken::class,
+        ]);
     }
 }

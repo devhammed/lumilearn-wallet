@@ -22,6 +22,7 @@ it('cannot register a new user with invalid data', function () {
     $response = postJson('/user', [
         'name' => 'John Doe',
         'email' => 'invalid-email',
+        'password' => 'password',
     ]);
 
     $response->assertUnprocessable()
@@ -38,6 +39,7 @@ it('cannot register a new user with an existing email', function () {
     $response = postJson('/user', [
         'name' => 'John Doe',
         'email' => 'john@example.com',
+        'password' => 'password',
     ]);
 
     $response->assertUnprocessable()
@@ -50,6 +52,7 @@ it('registers a new user', function () {
     $response = postJson('/user', [
         'name' => 'John Doe',
         'email' => 'john@example.com',
+        'password' => 'password',
     ]);
 
     $response->assertCreated()
@@ -76,7 +79,7 @@ it('registers a new user', function () {
     ]);
 
     $this->assertDatabaseHas('wallets', [
-        'user_id' => $response->json('user.id'),
+        'user_id' => $response->json('data.id'),
         'currency' => config('app.currency'),
         'balance' => 0,
     ]);
@@ -137,7 +140,9 @@ it('logs in a user', function () {
              ->assertJsonStructure([
                  'data' => [
                      'id',
+                     'name',
                      'token',
+                     'abilities',
                      'expires_at',
                  ],
              ]);
@@ -167,12 +172,14 @@ it('retrieves user information', function () {
 
     $response->assertOk()
              ->assertJson([
-                 'id' => $user->getKey(),
-                 'name' => 'John Doe',
-                 'email' => 'john@example.com',
-                 'wallet' => [
-                     'balance' => 0,
-                     'currency' => config('app.currency'),
+                 'data' => [
+                     'id' => $user->getKey(),
+                     'name' => 'John Doe',
+                     'email' => 'john@example.com',
+                     'wallet' => [
+                         'balance' => 0,
+                         'currency' => config('app.currency')->value,
+                     ],
                  ],
              ]);
 });
