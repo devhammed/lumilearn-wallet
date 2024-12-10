@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Auth\AuthManager;
+use Illuminate\Contracts\Auth\Guard;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Resources\PersonalAccessTokenResource;
 
@@ -12,11 +12,11 @@ class UserLoginController
     /**
      * Handle the incoming request.
      */
-    public function __invoke(UserLoginRequest $request, AuthManager $authManager): PersonalAccessTokenResource
+    public function __invoke(UserLoginRequest $request, Guard $guard): PersonalAccessTokenResource
     {
         $user = User::whereEmail($request->email)->first();
 
-        if ( ! $user || ! $authManager->validate($request->validated())) {
+        if ( ! $user || ! $guard->validate($request->validated())) {
             abort(401, __('These credentials do not match our records.'));
         }
 
