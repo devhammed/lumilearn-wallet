@@ -44,7 +44,7 @@ it('fails if the target user is the same as the current user', function () {
 
     $response = withToken($token)->postJson(route('debit'), [
         'to_user_id' => $user->getKey(),
-        'amount' => 10,
+        'amount' => fake()->randomFloat(2, 1, 100),
     ]);
 
     $response->assertUnprocessable();
