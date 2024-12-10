@@ -19,7 +19,7 @@ class DebitController
 
             $amount = $request->money('amount');
 
-            $fromUserWallet = $fromUser->wallet()->lockForUpdate()->firstOrFail();
+            $fromUserWallet = $fromUser->wallet()->lockForUpdate()->sole();
 
             $toUserWallet = Wallet::whereUserId($request->to_user_id)->lockForUpdate()->sole();
 
