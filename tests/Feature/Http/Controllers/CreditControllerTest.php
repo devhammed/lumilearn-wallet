@@ -8,7 +8,7 @@ use function Pest\Laravel\withoutToken;
 
 it('requires authentication', function () {
     $response = withoutToken()->postJson(route('credit'), [
-        'amount' => 10,
+        'amount' => fake()->randomFloat(2, 1, 100),
     ]);
 
     $response->assertUnauthorized();
