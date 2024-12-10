@@ -63,7 +63,8 @@ it('logs in a user', function () {
     $response->assertJsonStructure([
         'data' => [
             'id',
-            'user_id',
+            'tokenable_id',
+            'tokenable_type',
             'name',
             'token',
             'abilities',
@@ -73,7 +74,8 @@ it('logs in a user', function () {
 
     $response->assertJson([
         'data' => [
-            'user_id' => $user->getKey(),
+            'tokenable_id' => $user->getKey(),
+            'tokenable_type' => $user->getMorphClass(),
         ],
     ]);
 
