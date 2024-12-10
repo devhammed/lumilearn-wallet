@@ -48,13 +48,13 @@ class Wallet extends Model
     }
 
     /**
-     * Get or set the balance attribute.
+     * Get or set the "balance" attribute.
      */
     public function balance(): Attribute
     {
         return Attribute::make(
-            get: fn(int $value) => $value / $this->currency->getSubunit(),
-            set: fn(float $value) => $value * $this->currency->getSubunit(),
+            get: fn(int $value) => $this->currency->fromDatabaseAmount($value),
+            set: fn(float $value) => $this->currency->toDatabaseAmount($value),
         );
     }
 
