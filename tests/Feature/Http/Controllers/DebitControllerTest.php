@@ -59,9 +59,9 @@ it('fails if the amount is not greater than 0', function () {
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
+    $userWallet = Wallet::factory()->for($user)->withZeroBalance()->create();
 
-    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
+    $targetUserWallet = Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
     $response = withToken($token)->postJson(route('debit'), [
         'to_user_id' => $targetUser->getKey(),
@@ -71,6 +71,20 @@ it('fails if the amount is not greater than 0', function () {
     $response->assertUnprocessable();
 
     $response->assertJsonValidationErrors(['amount']);
+
+    $this->assertDatabaseHas('wallets', [
+        'id' => $userWallet->getKey(),
+        'user_id' => $user->getKey(),
+        'balance->amount' => $userWallet->balance->getAmount(),
+        'balance->currency' => $userWallet->balance->getCurrency()->getCurrency(),
+    ]);
+
+    $this->assertDatabaseHas('wallets', [
+        'id' => $targetUserWallet->getKey(),
+        'user_id' => $targetUser->getKey(),
+        'balance->amount' => $targetUserWallet->balance->getAmount(),
+        'balance->currency' => $targetUserWallet->balance->getCurrency()->getCurrency(),
+    ]);
 })->coversClass(DebitController::class);
 
 it('fails if the current user has insufficient balance', function () {
@@ -80,7 +94,7 @@ it('fails if the current user has insufficient balance', function () {
 
     $userWallet = Wallet::factory()->for($user)->create();
 
-    Wallet::factory()->for($targetUser)->withZeroBalance()->create();
+    $targetUserWallet = Wallet::factory()->for($targetUser)->withZeroBalance()->create();
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -93,6 +107,20 @@ it('fails if the current user has insufficient balance', function () {
 
     $response->assertJson([
         'message' => __('Insufficient balance'),
+    ]);
+
+    $this->assertDatabaseHas('wallets', [
+        'id' => $userWallet->getKey(),
+        'user_id' => $user->getKey(),
+        'balance->amount' => $userWallet->balance->getAmount(),
+        'balance->currency' => $userWallet->balance->getCurrency()->getCurrency(),
+    ]);
+
+    $this->assertDatabaseHas('wallets', [
+        'id' => $targetUserWallet->getKey(),
+        'user_id' => $targetUser->getKey(),
+        'balance->amount' => $targetUserWallet->balance->getAmount(),
+        'balance->currency' => $targetUserWallet->balance->getCurrency()->getCurrency(),
     ]);
 })->coversClass(DebitController::class)->repeat(50);
 
@@ -107,7 +135,7 @@ it('debits the current user wallet and credits the target user wallet', function
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $debitAmount = money(fake()->numberBetween(1, $userWallet->balance->getValue()), convert: true);
+    $debitAmount = money(fake()->randomFloat(2, 1, $userWallet->balance->getValue()), convert: true);
 
     $response = withToken($token)->postJson(route('debit'), [
         'to_user_id' => $targetUser->getKey(),

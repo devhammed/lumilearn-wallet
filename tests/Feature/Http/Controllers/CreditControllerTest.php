@@ -32,8 +32,10 @@ it('fails if the amount is not greater than 0', function () {
     $response->assertJsonValidationErrors(['amount']);
 
     $this->assertDatabaseHas('wallets', [
+        'id' => $wallet->getKey(),
         'user_id' => $user->getKey(),
         'balance->amount' => $wallet->balance->getAmount(),
+        'balance->currency' => $wallet->balance->getCurrency()->getCurrency(),
     ]);
 })->coversClass(CreditController::class);
 
@@ -42,7 +44,7 @@ it('credits the authenticated user wallet', function () {
 
     $wallet = Wallet::factory()->for($user)->create();
 
-    $creditAmount = money(fake()->numberBetween(10, 100), convert: true);
+    $creditAmount = money(fake()->randomFloat(2, 1, 100), convert: true);
 
     $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -57,7 +59,9 @@ it('credits the authenticated user wallet', function () {
     ]);
 
     $this->assertDatabaseHas('wallets', [
+        'id' => $wallet->getKey(),
         'user_id' => $user->getKey(),
         'balance->amount' => $wallet->balance->add($creditAmount)->getAmount(),
+        'balance->currency' => $wallet->balance->getCurrency()->getCurrency(),
     ]);
 })->coversClass(CreditController::class)->repeat(50);
