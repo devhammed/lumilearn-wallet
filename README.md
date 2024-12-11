@@ -13,7 +13,7 @@ The Lumilearn Wallet Platform.
 
 The project uses the database for models, cache, locks, sessions and queue jobs storage system to simplify the installation.
 
-You need to create MySQL databases for both development and testing environments e.g `lumilearn_wallet` for develop and `lumilearn_wallet_test` for testing.
+You need to create MySQL databases for both development and testing environments e.g `lumilearn_wallet` and `lumilearn_wallet_test`.
 
 Then run the following commands:
 
