@@ -26,9 +26,9 @@ $ composer install
 
 $ cp .env.example .env # Configure for development environment e.g update the database details
 
-$ cp .env.example .env.testing # Configure for testing environment e.g update the database details
-
 $ php artisan key:generate
+
+$ cp .env .env.testing # Configure for testing environment e.g update the database details
 
 $ php artisan migrate
 
