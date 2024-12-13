@@ -11,11 +11,11 @@ The Lumilearn Wallet Platform.
 
 ## Installation
 
-The project uses the database for models, cache, locks, sessions and queue jobs storage system to simplify the installation.
+The project uses the database as the storage system for models, cache, locks, sessions and queue jobs to simplify the installation.
 
 You need to create MySQL databases for both development and testing environments e.g `lumilearn_wallet` and `lumilearn_wallet_test`.
 
-Then run the following commands:
+Then run the following commands in your terminal:
 
 ```shell
 $ git clone git@github.com:devhammed/lumilearn-wallet.git
